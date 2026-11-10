@@ -35,7 +35,7 @@ public final class ConsoleApp {
                 return;
             }
             switch (opcao) {
-                case 1 -> Questao01.executar(saida);
+                case 1 -> Questao01.executar(entrada, saida);
                 case 2 -> Questao02.executar(entrada, saida);
                 case 3 -> Questao03.executar(saida);
                 case 4 -> Questao04.executar(saida);
