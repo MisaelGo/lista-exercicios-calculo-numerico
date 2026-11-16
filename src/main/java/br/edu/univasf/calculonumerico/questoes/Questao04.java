@@ -56,10 +56,25 @@ public final class Questao04 {
             saida.printf("Area pela Regra do Trapezio Repetida: %.6f m^2%n", areaTrapezio);
 
             try {
-                double areaSimpson = SimpsonRepetido.calcular(valores, passo);
+                SimpsonRepetido.Resultado simpson = SimpsonRepetido.calcularDetalhado(valores, passo);
+                double areaSimpson = simpson.areaTotal();
                 double diferenca = Math.abs(areaSimpson - areaTrapezio);
+
+                saida.printf("Estrategia de Simpson: %s%n", simpson.estrategia());
+                if (simpson.subintervalosSimpson13() > 0 && simpson.subintervalosSimpson38() > 0) {
+                    saida.printf("  - Parcela Simpson 1/3 (%d subintervalos): %.6f m^2%n",
+                            simpson.subintervalosSimpson13(), simpson.areaSimpson13());
+                    saida.printf("  - Parcela Simpson 3/8 (%d subintervalos): %.6f m^2%n",
+                            simpson.subintervalosSimpson38(), simpson.areaSimpson38());
+                }
                 saida.printf("Area pela Regra de Simpson Repetida:  %.6f m^2%n", areaSimpson);
                 saida.printf("Diferenca absoluta |Simpson - Trapezio|: %.6f m^2%n", diferenca);
+                if (Math.abs(areaSimpson) > 1e-12) {
+                    double diferencaRelativa = (diferenca / Math.abs(areaSimpson)) * 100.0;
+                    saida.printf("Diferenca relativa (base Simpson):       %.4f %%%n", diferencaRelativa);
+                }
+            } catch (IllegalArgumentException ex) {
+                saida.println("Regra de Simpson nao aplicavel: " + ex.getMessage());
             } catch (UnsupportedOperationException ignored) {
                 saida.println("Regra de Simpson: aguardando integracao do modulo de Carlos.");
             }
