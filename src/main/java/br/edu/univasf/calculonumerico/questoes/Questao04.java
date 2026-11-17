@@ -75,8 +75,6 @@ public final class Questao04 {
                 }
             } catch (IllegalArgumentException ex) {
                 saida.println("Regra de Simpson nao aplicavel: " + ex.getMessage());
-            } catch (UnsupportedOperationException ignored) {
-                saida.println("Regra de Simpson: aguardando integracao do modulo de Carlos.");
             }
         } catch (IllegalArgumentException ex) {
             saida.println("Nao foi possivel calcular: " + ex.getMessage());
