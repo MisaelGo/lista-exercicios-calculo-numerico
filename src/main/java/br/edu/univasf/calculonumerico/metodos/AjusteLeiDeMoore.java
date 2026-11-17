@@ -7,6 +7,7 @@ import java.util.List;
  * apos transformacao logaritmica y = log10(N) em funcao do ano.
  */
 public final class AjusteLeiDeMoore {
+    // Dados historicos originais da Questao 03.1 (pagina 4 do enunciado, 1971 a 2000).
     private static final String[] CHIPS_PADRAO = {
         "4004", "8008", "8080", "8086", "80286", "80386",
         "80486", "Pentium", "Pentium II", "Pentium III", "Pentium 4"
@@ -23,6 +24,7 @@ public final class AjusteLeiDeMoore {
 
     private AjusteLeiDeMoore() { }
 
+    /** Guarda os valores observados, transformados (log10) e ajustados de cada ponto da tabela. */
     public record PontoAjustado(
             double ano,
             double transistoresObservados,
@@ -32,12 +34,14 @@ public final class AjusteLeiDeMoore {
             double residuoLog10,
             double erroRelativoPercentual) { }
 
+    /** Guarda a previsao para um ano alvo, indicando se esta fora da faixa historica (extrapolacao). */
     public record Previsao(
             double ano,
             double log10Estimado,
             double transistoresEstimados,
             boolean extrapolacao) { }
 
+    /** Reune os coeficientes da reta ajustada, os indicadores de qualidade e a lista de pontos. */
     public record Resultado(
             double intercepto,
             double inclinacao,
@@ -56,11 +60,16 @@ public final class AjusteLeiDeMoore {
             pontos = List.copyOf(pontos);
         }
 
+        /**
+         * Estima log10(N) e N = 10^y para um ano alvo usando a forma centrada
+         * (evita perda de precisao ao subtrair termos grandes de c0 e c1*a).
+         */
         public Previsao prever(double ano) {
             if (!Double.isFinite(ano)) {
                 throw new IllegalArgumentException("O ano de previsao deve ser um numero finito.");
             }
             double yEstimado = log10NoAnoReferencia + inclinacao * (ano - anoReferencia);
+            // Limite de expoente (~10^308) para evitar overflow para Infinity em double
             if (!Double.isFinite(yEstimado) || yEstimado > 308.0) {
                 throw new IllegalArgumentException("Previsao fora da faixa representavel em ponto flutuante.");
             }
@@ -92,6 +101,7 @@ public final class AjusteLeiDeMoore {
                     "Sao necessarios pelo menos 2 pontos (ano, transistores) com vetores de mesmo tamanho.");
         }
 
+        // 1. Validacao dos dados e transformacao logaritmica y = log10(N)
         int n = anos.length;
         double[] logs = new double[n];
         double somaAnos = 0.0;
@@ -116,6 +126,8 @@ public final class AjusteLeiDeMoore {
             anoMax = Math.max(anoMax, ano);
         }
 
+        // 2. Somas centradas na media para evitar cancelamento subtrativo na regressao
+        //    Sxx = soma((x - x_bar)^2), Sxy = soma((x - x_bar)*(y - y_bar)), Syy = soma((y - y_bar)^2)
         double mediaAnos = somaAnos / n;
         double mediaLogs = somaLogs / n;
 
@@ -130,16 +142,19 @@ public final class AjusteLeiDeMoore {
             syy += dy * dy;
         }
 
+        // Se todos os anos forem iguais, Sxx = 0 e a inclinacao c1 fica indefinida
         if (sxx <= 1e-15) {
             throw new IllegalArgumentException(
                     "Os anos informados devem conter pelo menos dois valores distintos.");
         }
 
+        // 3. Coeficientes da reta y = c0 + c1*a e forma centrada em anoReferencia
         double inclinacao = sxy / sxx;
         double intercepto = mediaLogs - inclinacao * mediaAnos;
         double anoReferencia = anoMin;
         double log10NoAnoReferencia = mediaLogs + inclinacao * (anoReferencia - mediaAnos);
 
+        // 4. Reconstrucao N = 10^y em cada ponto e calculo dos residuos (log10 e relativo em N)
         PontoAjustado[] pontos = new PontoAjustado[n];
         double somaQuadradosResiduos = 0.0;
         for (int i = 0; i < n; i++) {
@@ -152,10 +167,12 @@ public final class AjusteLeiDeMoore {
                     anos[i], transistores[i], logs[i], yAjustado, nAjustado, residuo, erroRelativo);
         }
 
+        // 5. Indicadores de qualidade do ajuste (R^2 = 1 - Sr/Syy, RMSE) e tempo de duplicacao
         double rQuadrado = (syy > 1e-15)
                 ? Math.max(0.0, 1.0 - somaQuadradosResiduos / syy)
                 : (somaQuadradosResiduos <= 1e-15 ? 1.0 : 0.0);
         double rmseLog10 = Math.sqrt(somaQuadradosResiduos / n);
+        // Fator anual = 10^c1; tempo de duplicacao resolve 10^(c1 * Td) = 2 -> Td = log10(2) / c1
         double fatorCrescimentoAnual = Math.pow(10.0, inclinacao);
         double tempoDuplicacaoAnos = (inclinacao > 1e-15) ? Math.log10(2.0) / inclinacao : Double.NaN;
 

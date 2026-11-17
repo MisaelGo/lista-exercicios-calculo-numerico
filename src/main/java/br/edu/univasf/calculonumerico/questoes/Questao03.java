@@ -14,6 +14,7 @@ public final class Questao03 {
 
     private Questao03() { }
 
+    /** Exibe o submenu da Questao 03.1 e direciona para o modo escolhido. */
     public static void executar(Scanner entrada, PrintStream saida) {
         saida.println("\n--- Questao 03.1: Lei de Moore e Ajuste em Escala log10(N) ---");
         saida.println("1 - Dados originais do enunciado (1971 a 2000) e previsoes para 2010 e 2020");
@@ -30,6 +31,7 @@ public final class Questao03 {
         }
     }
 
+    /** Modo 1: usa os 11 chips do enunciado (1971-2000) e preve 2010/2020 (com extras opcionais). */
     private static void executarDadosOriginais(Scanner entrada, PrintStream saida) {
         double[] anos = AjusteLeiDeMoore.anosPadrao();
         double[] transistores = AjusteLeiDeMoore.transistoresPadrao();
@@ -42,6 +44,7 @@ public final class Questao03 {
         calcularEImprimir(saida, chips, anos, transistores, anosPrevisao);
     }
 
+    /** Modo 2: mantem os 11 pontos originais e acrescenta novas observacoes informadas pelo usuario. */
     private static void executarComPontosAdicionais(Scanner entrada, PrintStream saida) {
         double[] anosBase = AjusteLeiDeMoore.anosPadrao();
         double[] transBase = AjusteLeiDeMoore.transistoresPadrao();
@@ -77,6 +80,7 @@ public final class Questao03 {
         calcularEImprimir(saida, chips, anos, transistores, anosPrevisao);
     }
 
+    /** Modo 3: permite informar uma nova tabela completa de pares (ano, N) e anos de previsao. */
     private static void executarTabelaPersonalizada(Scanner entrada, PrintStream saida) {
         int n = ConsoleInput.inteiroPadrao(entrada, saida, "Quantidade de pontos da tabela (2 a 100)", 4, 2, 100);
         double[] anos = new double[n];
@@ -99,6 +103,7 @@ public final class Questao03 {
         calcularEImprimir(saida, chips, anos, transistores, anosPrevisao);
     }
 
+    /** Monta o vetor de anos alvo, incluindo 2010 e 2020 quando solicitado. */
     private static double[] lerAnosPrevisao(Scanner entrada, PrintStream saida,
                                             boolean incluirPadroes2010E2020, int quantidadeExtra) {
         List<Double> lista = new ArrayList<>();
@@ -117,11 +122,14 @@ public final class Questao03 {
         return lista.stream().mapToDouble(Double::doubleValue).toArray();
     }
 
+    /** Executa o ajuste por minimos quadrados em log10(N) e imprime tabela, modelo e previsoes. */
     private static void calcularEImprimir(PrintStream saida, String[] chips, double[] anos,
                                           double[] transistores, double[] anosPrevisao) {
         try {
+            // Ajusta a reta y = log10(N) pelos minimos quadrados
             AjusteLeiDeMoore.Resultado resultado = AjusteLeiDeMoore.ajustar(anos, transistores);
 
+            // Imprime cada ponto com o valor observado, log10(N), valor ajustado e erro relativo
             saida.println("\nTabela de dados e transformacao y = log10(N):");
             saida.printf("%-12s %8s %15s %11s %11s %16s %10s%n",
                     "Chip/Ponto", "Ano", "N observado", "log10(N)", "y ajust.", "N ajustado", "Erro rel.");
@@ -135,6 +143,7 @@ public final class Questao03 {
                         p.erroRelativoPercentual());
             }
 
+            // Exibe a equacao ajustada (geral e centrada), a funcao reconstruida e os indicadores
             saida.println("\nModelo ajustado por minimos quadrados (escala log10):");
             saida.printf("  y(a) = log10(N(a)) = %.6f + %.9f * a%n",
                     resultado.intercepto(), resultado.inclinacao());
@@ -152,6 +161,7 @@ public final class Questao03 {
                         resultado.tempoDuplicacaoAnos(), resultado.tempoDuplicacaoAnos() * 12.0);
             }
 
+            // Exibe as previsoes sinalizando quando o ano esta fora do intervalo calibrado
             saida.println("\nPrevisoes de numero de transistores (N = 10^y):");
             boolean houveExtrapolacao = false;
             for (double anoAlvo : anosPrevisao) {
@@ -163,6 +173,7 @@ public final class Questao03 {
                         prev.transistoresEstimados(), prev.transistoresEstimados(), tipo);
             }
 
+            // Alerta obrigatorio sobre os limites fisicos e matematicos da extrapolacao
             if (houveExtrapolacao) {
                 saida.printf("%nRessalva sobre extrapolacao: o ajuste foi calibrado no intervalo [%.1f, %.1f].%n",
                         resultado.anoMinimo(), resultado.anoMaximo());

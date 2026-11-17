@@ -56,11 +56,13 @@ public final class Questao04 {
             saida.printf("Area pela Regra do Trapezio Repetida: %.6f m^2%n", areaTrapezio);
 
             try {
+                // Calcula por Simpson (1/3, 3/8 ou composicao 1/3 + 3/8) e compara com o Trapezio
                 SimpsonRepetido.Resultado simpson = SimpsonRepetido.calcularDetalhado(valores, passo);
                 double areaSimpson = simpson.areaTotal();
                 double diferenca = Math.abs(areaSimpson - areaTrapezio);
 
                 saida.printf("Estrategia de Simpson: %s%n", simpson.estrategia());
+                // Quando ha composicao (caso do navio com m = 7), mostra as duas parcelas separadas
                 if (simpson.subintervalosSimpson13() > 0 && simpson.subintervalosSimpson38() > 0) {
                     saida.printf("  - Parcela Simpson 1/3 (%d subintervalos): %.6f m^2%n",
                             simpson.subintervalosSimpson13(), simpson.areaSimpson13());
@@ -74,6 +76,7 @@ public final class Questao04 {
                     saida.printf("Diferenca relativa (base Simpson):       %.4f %%%n", diferencaRelativa);
                 }
             } catch (IllegalArgumentException ex) {
+                // Ex.: se o usuario informar apenas 2 pontos (m = 1), apenas o Trapezio se aplica
                 saida.println("Regra de Simpson nao aplicavel: " + ex.getMessage());
             }
         } catch (IllegalArgumentException ex) {
