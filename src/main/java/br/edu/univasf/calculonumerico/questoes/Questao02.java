@@ -11,9 +11,18 @@ public final class Questao02 {
 
     public static void executar(Scanner entrada, PrintStream saida) {
         saida.println("\n--- Questao 02.1: Ponte de Wheatstone ---");
-        saida.println("Nos A=E e D=0; sentidos: I1 A->B, I2 A->C, I3 C->D,");
-        saida.println("I4 B->D, I5 B->C, I6 D->A.");
-        saida.println("ENTER aceita o valor padrao; virgula ou ponto sao validos.");
+        saida.println("Nos de referencia:");
+        saida.println("  A = E");
+        saida.println("  D = 0 V");
+        saida.println("Sentidos das correntes:");
+        saida.println("  I1: A -> B");
+        saida.println("  I2: A -> C");
+        saida.println("  I3: C -> D");
+        saida.println("  I4: B -> D");
+        saida.println("  I5: B -> C");
+        saida.println("  I6: D -> A");
+        saida.println("\nPressione ENTER para usar o valor padrao.");
+        saida.println("Use virgula ou ponto nos numeros decimais.\n");
         double e = ConsoleInput.decimalPadrao(entrada, saida, "Tensao E (V)", 30, false);
         double r1 = ConsoleInput.decimalPadrao(entrada, saida, "R1 (ohms)", 20, true);
         double r2 = ConsoleInput.decimalPadrao(entrada, saida, "R2 (ohms)", 120, true);
@@ -26,11 +35,11 @@ public final class Questao02 {
         try {
             PonteWheatstone.Resultado r = PonteWheatstone.calcular(e, r1, r2, r3, r4, r5,
                     tolerancia, maxIteracoes);
-            saida.printf("%nPotenciais: VB = %.9f V; VC = %.9f V%n", r.potencialB(), r.potencialC());
+            saida.printf("%nPotenciais:%n  VB = %.9f V%n  VC = %.9f V%n", r.potencialB(), r.potencialC());
             saida.printf("I1 = %.9f A%nI2 = %.9f A%nI3 = %.9f A%n", r.i1(), r.i2(), r.i3());
             saida.printf("I4 = %.9f A%nI5 = %.9f A%nI6 = %.9f A%n", r.i4(), r.i5(), r.i6());
-            saida.printf("Iteracoes: %d | Residuo nodal: %.3e A%n", r.iteracoes(), r.residuoNodal());
-            saida.printf("Verificacao KCL: %.3e A | KVL: %.3e V%n",
+            saida.printf("%nIteracoes: %d%nResiduo nodal: %.3e A%n", r.iteracoes(), r.residuoNodal());
+            saida.printf("Verificacao KCL: %.3e A%nVerificacao KVL: %.3e V%n",
                     r.residuoKirchhoffCorrentes(), r.residuoKirchhoffTensoes());
             saida.println("Corrente negativa indica fluxo oposto ao sentido adotado.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
