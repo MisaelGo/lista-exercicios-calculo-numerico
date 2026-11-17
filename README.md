@@ -59,14 +59,6 @@ O projeto utiliza **JUnit 5** e um fluxo do GitHub Actions em `.github/workflows
 
 Os testes cobrem soluções de referência, casos alternativos e rejeição de entradas inválidas. A aprovação dos testes automatizados não substitui a revisão manual das quatro opções do menu.
 
-## Relatório e entrega
-
-O **relatório é preparado colaborativamente no Google Docs**, fora deste repositório. Deve apresentar introdução, modelagem matemática, metodologia, resultados e discussão, conclusão, referências e uma breve descrição da contribuição individual de cada integrante.
-
-- **Apresentação:** 17/11/2026, conforme organização da equipe; presença dos três integrantes obrigatória.
-- **Entrega do relatório e código:** até 20/11/2026, pela plataforma indicada pelo professor.
-
-Os materiais de apoio temporários da antiga pasta `docs/` foram retirados da versão atual do repositório. Caso algum conteúdo seja necessário para a redação, ele pode ser consultado no **histórico de commits**.
 
 ## Colaboração
 
